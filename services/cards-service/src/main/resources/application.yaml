@@ -1,3 +1,8 @@
 spring:
   application:
     name: cards-service
+  datasource:
+    url: ${CARDS_DB_URL}
+    username: ${CARDS_DB_USER}
+    password: ${CARDS_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
