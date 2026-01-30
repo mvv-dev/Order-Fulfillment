@@ -3,6 +3,7 @@ package com.mvv.cards_service.infra.persistence.mapper;
 import com.mvv.cards_service.domain.model.Card;
 import com.mvv.cards_service.domain.model.CardType;
 import com.mvv.cards_service.infra.persistence.entity.CardEntity;
+import com.mvv.cards_service.infra.persistence.entity.CardTypeEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,9 @@ public class CardPersistenceMapper {
 
     public CardEntity toEntity(Card card) {
         CardEntity entity = new CardEntity();
+        CardTypeEntity typeEntity = cardTypePersistenceMapper.toEntity(card.getType());
         entity.setId(card.getId());
+        entity.setType(typeEntity);
         entity.setKeycloakUserId(card.getKeycloakUserId());
         entity.setBalance(card.getBalance());
         return entity;

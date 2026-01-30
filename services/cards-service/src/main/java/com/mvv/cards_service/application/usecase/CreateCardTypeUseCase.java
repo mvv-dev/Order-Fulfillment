@@ -1,5 +1,6 @@
 package com.mvv.cards_service.application.usecase;
 
+import com.mvv.cards_service.application.exception.DuplicateRegisterException;
 import com.mvv.cards_service.application.usecase.command.CreateCardTypeCommand;
 import com.mvv.cards_service.domain.model.Brand;
 import com.mvv.cards_service.domain.model.CardType;
@@ -22,12 +23,11 @@ public class CreateCardTypeUseCase {
 
         var cardFoudByThisName = cardTypeRepository.findByName(cmd.name());
         if (cardFoudByThisName.isPresent()) {
-            throw new RuntimeException("Card Type already exists");
+            throw new DuplicateRegisterException("Card Type already exists");
         }
 
         // Constructors' going to validate this type
         CardType type = new CardType(cmd.name(), cmd.brand(), cmd.initialBalance());
-        System.out.println(type.getId());
         return cardTypeRepository.save(type);
 
 

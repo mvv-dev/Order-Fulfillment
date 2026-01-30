@@ -5,7 +5,7 @@ import com.mvv.cards_service.domain.model.Brand;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record HttpResponseCreateCardTypeDTO (
+public record HttpResponseSearchCardTypeDTO(
         UUID id,
         String name,
         Brand brand,

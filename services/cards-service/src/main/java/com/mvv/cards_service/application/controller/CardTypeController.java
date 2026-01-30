@@ -1,7 +1,7 @@
 package com.mvv.cards_service.application.controller;
 
 import com.mvv.cards_service.application.dto.HttpCreateCardTypeDTO;
-import com.mvv.cards_service.application.dto.HttpResponseCreateCardTypeDTO;
+import com.mvv.cards_service.application.dto.HttpResponseSearchCardTypeDTO;
 import com.mvv.cards_service.application.mapper.CardTypeMapper;
 import com.mvv.cards_service.application.usecase.CreateCardTypeUseCase;
 import com.mvv.cards_service.application.usecase.command.CreateCardTypeCommand;
@@ -10,13 +10,13 @@ import com.mvv.cards_service.domain.repository.CardTypeRepositoryPort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("card-types")
@@ -27,6 +27,7 @@ public class CardTypeController {
     private final CreateCardTypeUseCase createCardTypeUseCase;
     private final CardTypeRepositoryPort cardTypeRepositoryPort;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody @Valid HttpCreateCardTypeDTO createCardTypeDTO) {
 
@@ -42,12 +43,13 @@ public class CardTypeController {
 
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<HttpResponseCreateCardTypeDTO> findById(@PathVariable("id") String id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("{id}")
+    public ResponseEntity<HttpResponseSearchCardTypeDTO> findById(@PathVariable("id") String id) {
 
         var cardType = cardTypeRepositoryPort.findById(UUID.fromString(id)).orElse(null);
         if (cardType == null) return ResponseEntity.notFound().build();
-        HttpResponseCreateCardTypeDTO responseCreateCardTypeDTO = new HttpResponseCreateCardTypeDTO(
+        HttpResponseSearchCardTypeDTO responseCreateCardTypeDTO = new HttpResponseSearchCardTypeDTO(
                 cardType.getId(), cardType.getName(), cardType.getBrand(), cardType.getInitialBalance()
         );
 
@@ -55,25 +57,13 @@ public class CardTypeController {
 
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<HttpResponseCreateCardTypeDTO> findByName(@PathVariable("name") String name) {
-
-        var cardType = cardTypeRepositoryPort.findByName(name).orElse(null);
-        if (cardType == null) return ResponseEntity.notFound().build();
-        HttpResponseCreateCardTypeDTO responseCreateCardTypeDTO = new HttpResponseCreateCardTypeDTO(
-                cardType.getId(), cardType.getName(), cardType.getBrand(), cardType.getInitialBalance()
-        );
-
-        return ResponseEntity.ok(responseCreateCardTypeDTO);
-
-    }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<HttpResponseCreateCardTypeDTO>> search() {
+    public ResponseEntity<List<HttpResponseSearchCardTypeDTO>> search() {
 
         List<CardType> cardTypes = cardTypeRepositoryPort.search();
-        List<HttpResponseCreateCardTypeDTO> cardsTypesResponseDto = cardTypes.stream().map(
-                cardType -> new HttpResponseCreateCardTypeDTO(
+        List<HttpResponseSearchCardTypeDTO> cardsTypesResponseDto = cardTypes.stream().map(
+                cardType -> new HttpResponseSearchCardTypeDTO(
                         cardType.getId(), cardType.getName(), cardType.getBrand(), cardType.getInitialBalance()
                 )
         ).toList();

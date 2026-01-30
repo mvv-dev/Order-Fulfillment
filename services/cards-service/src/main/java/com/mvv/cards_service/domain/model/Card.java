@@ -32,7 +32,7 @@ public class Card {
 
     }
 
-    public Card(UUID keycloakUserId, CardType type) {
+    public Card(UUID keycloakUserId, CardType type, BigDecimal balance) {
 
         // Aqui vou validar o keycloakuserID em security
         if (keycloakUserId == null || type == null) {
