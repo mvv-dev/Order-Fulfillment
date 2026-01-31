@@ -24,7 +24,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.POST, "/card-types/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/card-types/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/card/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/card/create/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/card/**").hasRole("ADMIN"))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())

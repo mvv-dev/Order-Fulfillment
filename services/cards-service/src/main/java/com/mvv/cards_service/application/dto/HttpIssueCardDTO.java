@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public record HttpIssueCardDTO(
         @NotNull(message = "Campo Obrigatório")
-        @org.hibernate.validator.constraints.UUID
         UUID cardTypeId
 ) {
 }
