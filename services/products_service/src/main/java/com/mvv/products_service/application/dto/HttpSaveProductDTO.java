@@ -1,20 +1,18 @@
-package com.mvv.cards_service.application.dto;
+package com.mvv.products_service.application.dto;
 
-import com.mvv.cards_service.domain.model.Brand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-public record HttpCreateCardTypeDTO(
+public record HttpSaveProductDTO(
         @NotBlank(message = "Required field")
-        @Size(max = 80, message = "The field exceeds 80 characters.")
+        @Size(max = 100, message = "The field exceeds 100 characters.")
         String name,
         @NotNull(message = "Required field")
-        Brand brand,
+        BigDecimal price,
         @NotNull(message = "Required field")
-        BigDecimal initialBalance
-
+        Integer quantityLeft
 ) {
 }

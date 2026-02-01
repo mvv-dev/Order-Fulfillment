@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record HttpIssueCardDTO(
-        @NotNull(message = "Campo Obrigatório")
+        @NotNull(message = "Required field")
         UUID cardTypeId
 ) {
 }
