@@ -22,7 +22,7 @@ public class CloudgatewayApplication {
 				routes()
 				.route(r -> r.path("/card/**").uri("lb://cards-service"))
 				.route(r -> r.path("/card-types/**").uri("lb://cards-service"))
-				.route(r -> r.path("/products/**").uri("lb://products_service"))
+				.route(r -> r.path("/products/**").uri("lb://products-service"))
 				.build();
 
 	}
