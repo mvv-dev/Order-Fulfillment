@@ -46,7 +46,7 @@ public class ProductController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping("id/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<HttpProductSearchResponseDTO> findById(@PathVariable("id") String id) {
 
         UUID productId = UUID.fromString(id);
@@ -62,8 +62,8 @@ public class ProductController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping("name/{name}")
-    public ResponseEntity<HttpProductSearchResponseDTO> findByName(@PathVariable("name") String name) {
+    @GetMapping(params = "name")
+    public ResponseEntity<HttpProductSearchResponseDTO> findByName(@RequestParam("name") String name) {
 
         Optional<Product> product = productRepositoryPort.findByName(name);
 

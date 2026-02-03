@@ -1,4 +1,4 @@
-package com.mvv.products_service.infra.security;
+package com.mvv.orders_service.infra.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +21,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/products/**").hasAnyRole("ADMIN", "USER"))
+                        .requestMatchers(HttpMethod.POST, "/orders/**").hasAnyRole("ADMIN", "USER"))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
                 ));
@@ -42,4 +41,3 @@ public class SecurityConfig {
     }
 
 }
-
