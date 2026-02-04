@@ -1,12 +1,26 @@
 package com.mvv.orders_service.application.usecase.command;
 
-import com.mvv.orders_service.application.controller.dto.HttpProductDTO;
-import com.mvv.orders_service.domain.model.OrderItem;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
 
-public record CreateOrderCommand(
-        UUID keycloakUserId, UUID cardId, List<CreateOrderItemCommand> items
-) {
+@Getter
+public class CreateOrderCommand {
+
+    private final UUID orderId;
+    private final UUID keycloakUserId;
+    private final UUID cardId;
+    private final List<CreateOrderItemCommand> items;
+
+    public CreateOrderCommand(UUID keycloakUserId, UUID cardId, List<CreateOrderItemCommand> items) {
+
+        this.orderId = UUID.randomUUID();
+        this.keycloakUserId = keycloakUserId;
+        this.cardId = cardId;
+        this.items = items;
+
+    }
+
+
 }

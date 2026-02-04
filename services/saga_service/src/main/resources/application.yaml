@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: saga-service
+
+server:
+  port: 8086
+
+eureka:
+  client:
+    service-url:
+      defaultzone: http://localhost:8761/eureka
+  instance:
+    instance_id: ${spring.application.name}:${spring.eureka.instance_id:${random.value}}
+    prefer-ip-address: true
