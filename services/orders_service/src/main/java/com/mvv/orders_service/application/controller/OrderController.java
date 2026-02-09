@@ -1,10 +1,9 @@
 package com.mvv.orders_service.application.controller;
 
 import com.mvv.orders_service.application.controller.dto.HttpCreateOrderDTO;
+import com.mvv.orders_service.application.payload.event.orders_solicited.ItemsSolicited;
 import com.mvv.orders_service.application.usecase.CreateOrderUseCase;
-import com.mvv.orders_service.application.usecase.command.CreateOrderCommand;
-import com.mvv.orders_service.application.usecase.command.CreateOrderItemCommand;
-import com.mvv.orders_service.domain.model.Order;
+import com.mvv.orders_service.application.usecase.SolicitOrderUseCase;
 import com.mvv.orders_service.domain.repository.OrderRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,17 +23,20 @@ import java.util.UUID;
 public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
+    private final SolicitOrderUseCase solicitOrderUseCase;
     private final OrderRepositoryPort orderRepositoryPort;
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody HttpCreateOrderDTO dto, @AuthenticationPrincipal Jwt jwt) {
 
         UUID sub = UUID.fromString(jwt.getSubject());
-        List<CreateOrderItemCommand> cmdItems = dto.products().stream().map(
-                itemDTO -> new CreateOrderItemCommand(itemDTO.name(), itemDTO.quantity())
-        ).toList();
-        var cmdOrder = new CreateOrderCommand(sub, dto.cardId(), cmdItems);
-        Order orderSaved = createOrderUseCase.execute(cmdOrder);
+        UUID cardId = dto.cardId();
+
+        List<ItemsSolicited> items = dto.products().stream().
+                map(httpProductDTO -> new ItemsSolicited(httpProductDTO.name(), httpProductDTO.quantity()))
+                .toList();
+
+        solicitOrderUseCase.execute(sub, cardId, items);
 
         return ResponseEntity.ok().build();
 

@@ -1,46 +1,56 @@
 package com.mvv.orders_service.application.usecase;
 
-import com.mvv.orders_service.application.mapper.OrderEventMapper;
-import com.mvv.orders_service.application.usecase.command.CreateOrderCommand;
+import com.mvv.orders_service.application.payload.common.*;
+import com.mvv.orders_service.application.payload.common.envelope.Envelope;
+import com.mvv.orders_service.application.payload.command.orders_create.OrdersCreate;
+import com.mvv.orders_service.application.payload.event.orders_created.OrdersCreated;
 import com.mvv.orders_service.domain.model.Order;
 import com.mvv.orders_service.domain.model.OrderItem;
-import com.mvv.orders_service.infra.amqp.dto.OrderSolicitedEventDTO;
 import com.mvv.orders_service.infra.amqp.publisher.OrderEventPublisher;
-import com.mvv.orders_service.infra.clients.ProductsResourceClient;
-import com.mvv.orders_service.infra.clients.dto.ProductDTO;
-import com.mvv.orders_service.infra.clients.mapper.ProductToOrderItemMapper;
 import com.mvv.orders_service.infra.persistence.adapter.OrderRepositoryAdapter;
-import com.mvv.orders_service.infra.persistence.entity.OrderProductsEntity;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CreateOrderUseCase {
 
-    private final ProductsResourceClient productsResourceClient;
     private final OrderRepositoryAdapter orderRepositoryAdapter;
-    private final ProductToOrderItemMapper productToOrderItemMapper;
     private final OrderEventPublisher orderEventPublisher;
-    private final OrderEventMapper orderEventMapper;
+
+    public void execute(Envelope<OrdersCreate> envelope) {
+
+        OrdersCreate commandPayload = envelope.payload();
+
+        List<OrderItem> ordersItems = commandPayload.items().stream()
+                .map(envolopeItem -> OrderItem.create(envolopeItem.productId(), envolopeItem.name()
+                        , envolopeItem.price(), envolopeItem.requestedQuantity())).toList();
+
+        Order orderToSave = new Order(commandPayload.requestId(),commandPayload.customer().keycloakUserId(),
+                commandPayload.card().cardId(), ordersItems, commandPayload.amount());
 
 
-    public Order execute(CreateOrderCommand command) {
 
-        //Initial code, without card validation and rabbitmq
-        //Only basic products check
-        OrderSolicitedEventDTO solicitedEventDTO = orderEventMapper.toOrderSolicitedEventDTO(command);
-        System.out.println("Tentaiva de publicar uma mensagem para saga");
-        orderEventPublisher.publishOrderSolicited(solicitedEventDTO);
+        Order orderSaved = orderRepositoryAdapter.save(orderToSave);
 
-        return null;
+        OrdersCreated eventPayload = new OrdersCreated(
+                orderSaved.getId(), new Customer(orderSaved.getKeycloakUserId()), new Card(orderSaved.getCardId()),
+                commandPayload.items().stream().map(payloadItem -> new ItemsOrder(
+                        payloadItem.productId(), payloadItem.name(), payloadItem.price(), payloadItem.quantityLeft(),
+                        payloadItem.requestedQuantity())).toList(), commandPayload.amount(), StatusOrder.PENDING);
+
+        Envelope<OrdersCreated> eventEnvelope = new Envelope<>(
+                UUID.randomUUID(), "event.orders.created", MessageType.EVENT,
+                Instant.now(), envelope.correlationId(), envelope.messageId(), "orders-source", eventPayload
+        );
+
+        orderEventPublisher.publish(eventEnvelope);
+        System.out.println("Pedido salvo: " + orderSaved);
 
     }
 

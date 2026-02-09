@@ -31,20 +31,30 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     public Order save(Order order) {
 
         OrderEntity orderEntity = orderPersistenceMapper.toEntity(order);
-        List<OrderProductsEntity> orderProductsEntities = order.getItems().
-                stream().map(item -> orderProductsPersistenceMapper.toEntity(order.getId(), item)).toList();
-
         OrderEntity savedOrderEntity = orderJpaRepository.save(orderEntity);
-        List<OrderProductsEntity> savedOrderProductsEntities = orderProductsJpaRepository.saveAll(orderProductsEntities);
 
-        return orderPersistenceMapper.toDomain(savedOrderEntity, savedOrderProductsEntities);
+        if (!orderProductsJpaRepository.existsByOrderId(order.getId())) {
+            var items = order.getItems().stream()
+                    .map(item -> orderProductsPersistenceMapper.toEntity(order.getId(), item))
+                    .toList();
+            orderProductsJpaRepository.saveAll(items);
+        }
+
+        var savedItems = orderProductsJpaRepository.findByOrderId(order.getId());
+
+        return orderPersistenceMapper.toDomain(savedOrderEntity, savedItems);
 
     }
 
 
     @Override
-    public Optional<Order> findByid(UUID id) {
-        return Optional.empty();
+    public Optional<Order> findById(UUID id) {
+        return orderJpaRepository.findById(id).map(orderEntity -> {
+            List<OrderProductsEntity> items =
+                    orderProductsJpaRepository.findByOrderId(id);
+
+            return orderPersistenceMapper.toDomain(orderEntity, items);
+        });
     }
 
     @Override

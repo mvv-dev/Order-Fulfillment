@@ -35,14 +35,18 @@ public class Order {
 
     }
 
-    public Order(UUID keycloakUserId, UUID cardId, List<OrderItem> items) {
+    public Order(UUID orderId, UUID keycloakUserId, UUID cardId, List<OrderItem> items, BigDecimal totalAmount) {
 
-        this.id = UUID.randomUUID();
         this.status = Status.PENDING;
-        this.totalAmount = BigDecimal.ZERO;
+        this.id = Objects.requireNonNull(orderId, "OrderId must be not null");
         this.keycloakUserId = Objects.requireNonNull(keycloakUserId, "User id must not be null");
         this.cardId = Objects.requireNonNull(cardId, "Card id must no be null");
         this.items = Objects.requireNonNull(items, "Items  must not be null");
+        this.totalAmount = Objects.requireNonNull(totalAmount, "Total Amount  must not be null");
+
+        if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total amount must be higher than 0");
+        }
 
     }
 
@@ -51,6 +55,10 @@ public class Order {
 
         return new Order(id, status, totalAmount, keycloakUserId, cardId, items);
 
+    }
+
+    public void cancelOrder() {
+        this.status = Status.CANCELLED;
     }
 
 }

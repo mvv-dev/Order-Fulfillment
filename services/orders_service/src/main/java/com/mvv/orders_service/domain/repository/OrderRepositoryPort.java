@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface OrderRepositoryPort {
 
     Order save(Order order);
-    Optional<Order> findByid(UUID id);
+    Optional<Order> findById(UUID id);
     List<Order> search();
 
 }
