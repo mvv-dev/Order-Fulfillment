@@ -6,12 +6,14 @@ import com.mvv.saga_service.application.contracts.commands.payload.products_chec
 import com.mvv.saga_service.application.contracts.common.Envelope;
 import com.mvv.saga_service.application.port.out.CommandPublisherPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SagaCommandsPublisher implements CommandPublisherPort {
 
     private final RabbitTemplate rabbitTemplate;
@@ -25,7 +27,7 @@ public class SagaCommandsPublisher implements CommandPublisherPort {
        try {
            String json = objectMapper.writeValueAsString(envelope);
             rabbitTemplate.convertAndSend(exchange.getName(), envelope.name(), json);
-            System.out.println("Mensagem enviada: " + json);
+            log.info("A new command was published: {}", json);
        } catch (Exception e) {
            throw new RuntimeException("Error serializing/publishing message: " + envelope.name(), e);
        }

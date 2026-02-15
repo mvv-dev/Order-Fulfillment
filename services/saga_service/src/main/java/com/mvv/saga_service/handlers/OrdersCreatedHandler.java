@@ -11,12 +11,14 @@ import com.mvv.saga_service.application.contracts.common.items.ItemsOrder;
 import com.mvv.saga_service.application.contracts.events.payload.orders_created.OrdersCreated;
 import com.mvv.saga_service.application.port.out.CommandPublisherPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrdersCreatedHandler {
@@ -25,6 +27,8 @@ public class OrdersCreatedHandler {
     private final ObjectMapper objectMapper;
 
     public void handle (Envelope<JsonNode> envelope) {
+
+        log.info("Order was successfully registered in database");
 
         OrdersCreated eventPayload = objectMapper.convertValue(envelope.payload(), OrdersCreated.class);
         List<ItemsOrder> eventPayloadItems = eventPayload.items().stream().map(
@@ -41,6 +45,7 @@ public class OrdersCreatedHandler {
                 Instant.now(), envelope.correlationId(), envelope.messageId(), "saga-source", commandPayload
         );
 
+        log.info("A message to check inventory reserve will be published");
         publisherPort.publish(commandEnvelope);
 
     }

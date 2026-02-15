@@ -1,9 +1,6 @@
 package com.mvv.products_service.application.payload.event.products_inventory_reserved;
 
-import com.mvv.products_service.application.payload.common.Card;
-import com.mvv.products_service.application.payload.common.Customer;
-import com.mvv.products_service.application.payload.common.StatusOrder;
-import com.mvv.products_service.application.payload.common.StatusProduct;
+import com.mvv.products_service.application.payload.common.*;
 
 import java.math.BigDecimal;
 import java.util.List;

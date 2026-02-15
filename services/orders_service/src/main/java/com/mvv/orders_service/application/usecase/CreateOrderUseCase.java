@@ -10,6 +10,7 @@ import com.mvv.orders_service.infra.amqp.publisher.OrderEventPublisher;
 import com.mvv.orders_service.infra.persistence.adapter.OrderRepositoryAdapter;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CreateOrderUseCase {
 
     private final OrderRepositoryAdapter orderRepositoryAdapter;
@@ -37,6 +39,7 @@ public class CreateOrderUseCase {
 
 
         Order orderSaved = orderRepositoryAdapter.save(orderToSave);
+        log.info("A new order was created in database: {}", orderSaved);
 
         OrdersCreated eventPayload = new OrdersCreated(
                 orderSaved.getId(), new Customer(orderSaved.getKeycloakUserId()), new Card(orderSaved.getCardId()),
@@ -49,8 +52,9 @@ public class CreateOrderUseCase {
                 Instant.now(), envelope.correlationId(), envelope.messageId(), "orders-source", eventPayload
         );
 
+        log.info("A message to confirm the creation of new order will be published: {}", eventPayload);
         orderEventPublisher.publish(eventEnvelope);
-        System.out.println("Pedido salvo: " + orderSaved);
+
 
     }
 

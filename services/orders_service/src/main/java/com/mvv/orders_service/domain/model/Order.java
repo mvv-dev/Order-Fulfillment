@@ -61,4 +61,6 @@ public class Order {
         this.status = Status.CANCELLED;
     }
 
+    public void confirmOrder(){this.status = Status.CONFIRMED;}
+
 }

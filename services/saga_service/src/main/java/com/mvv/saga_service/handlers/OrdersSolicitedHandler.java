@@ -8,11 +8,13 @@ import com.mvv.saga_service.application.contracts.common.items.ItemsSolicited;
 import com.mvv.saga_service.application.contracts.events.payload.orders_solicited.OrdersSolicited;
 import com.mvv.saga_service.application.port.out.CommandPublisherPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrdersSolicitedHandler {
@@ -21,6 +23,8 @@ public class OrdersSolicitedHandler {
     private final ObjectMapper objectMapper;
 
     public void handle(Envelope<JsonNode> envelope) {
+
+        log.info("A new order was solicited: {}", envelope.payload());
 
         OrdersSolicited eventPayload = objectMapper.convertValue(
                 envelope.payload(), OrdersSolicited.class
@@ -38,7 +42,8 @@ public class OrdersSolicitedHandler {
                 commandPayload
         );
 
-        publisherPort.publish(commandEnvelope );
+        log.info("A new message to check order items will be published: {}", envelope.payload());
+        publisherPort.publish(commandEnvelope);
 
     }
 

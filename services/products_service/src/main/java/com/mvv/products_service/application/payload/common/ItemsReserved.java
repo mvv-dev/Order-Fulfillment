@@ -1,6 +1,5 @@
-package com.mvv.products_service.application.payload.event.products_inventory_reserved;
+package com.mvv.products_service.application.payload.common;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ItemsReserved(

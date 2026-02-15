@@ -9,6 +9,7 @@ import com.mvv.saga_service.application.contracts.events.payload.products_items_
 import com.mvv.saga_service.application.contracts.common.StatusProduct;
 import com.mvv.saga_service.application.port.out.CommandPublisherPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductsItemsCheckedHandler {
 
     private final ObjectMapper objectMapper;
@@ -50,10 +52,12 @@ public class ProductsItemsCheckedHandler {
                     envelope.correlationId(), envelope.messageId(), "saga-source", ordersCreatePayload
             );
 
+            log.info("All items exists in stock. A message to check the available quantity will be published.");
             commandPublisherPort.publish(envelopeOrdersCreate);
 
         } else {
-            System.out.println("FAILED, some producuts does not exist.");
+            log.info("We were unable to proceed with the order due to the following products: {}", eventPayload.errors());
+            throw new RuntimeException("Some products are not in stock");
         }
 
     }

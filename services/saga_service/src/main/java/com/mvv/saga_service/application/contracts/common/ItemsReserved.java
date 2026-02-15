@@ -1,4 +1,4 @@
-package com.mvv.saga_service.application.contracts.events.payload.products_inventory_reserved;
+package com.mvv.saga_service.application.contracts.common;
 
 import java.util.UUID;
 

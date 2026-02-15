@@ -1,6 +1,9 @@
 spring:
   application:
     name: saga-service
+  output:
+    ansi:
+      enabled: ALWAYS #Hablitando cores no console
 
 server:
   port: 8086
@@ -12,3 +15,6 @@ eureka:
   instance:
     instance_id: ${spring.application.name}:${spring.eureka.instance_id:${random.value}}
     prefer-ip-address: true
+logging:
+  pattern:
+    console: '%clr(%d{dd-MM-yyyy HH:mm:ss}){faint} %clr(%5p) %clr([%t]){faint} %clr(%-40.40logger){cyan} %clr(:){yellow} %m%n'

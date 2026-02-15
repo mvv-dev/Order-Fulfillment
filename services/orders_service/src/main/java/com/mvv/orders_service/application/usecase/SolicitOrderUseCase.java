@@ -9,6 +9,7 @@ import com.mvv.orders_service.application.payload.event.orders_solicited.ItemsSo
 import com.mvv.orders_service.application.payload.event.orders_solicited.OrdersSolicited;
 import com.mvv.orders_service.application.port.out.OrdersEventPublisherPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SolicitOrderUseCase {
 
     private final OrdersEventPublisherPort publisherPort;
@@ -36,6 +38,7 @@ public class SolicitOrderUseCase {
                 payload
         );
 
+        log.info("A new message to solicit a new order will be published.");
         publisherPort.publish(eventEnvelope);
 
     }

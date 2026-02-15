@@ -60,7 +60,7 @@ public class Product {
         return new Product(id, name, price, quantity_left);
     }
 
-    public boolean updateQuantity(Integer demand) {
+    public void updateQuantity(Integer demand) {
 
         if (demand == null) {
             throw new IllegalArgumentException("Demand must not be null");
@@ -72,7 +72,17 @@ public class Product {
 
         quantityLeft -= demand;
         if (quantityLeft == 0) productStatus = Status.SOLDOUT;
-        return true;
+
+
+    }
+
+    public void releaseQuantity(Integer demand) {
+
+        if (demand == null) {
+            throw new IllegalArgumentException("Demand must not be null");
+        }
+
+        quantityLeft += demand;
 
     }
 

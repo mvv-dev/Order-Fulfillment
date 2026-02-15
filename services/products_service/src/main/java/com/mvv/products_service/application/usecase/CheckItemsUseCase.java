@@ -11,6 +11,7 @@ import com.mvv.products_service.application.port.out.ProductsEventPublisherPort;
 import com.mvv.products_service.domain.model.Product;
 import com.mvv.products_service.domain.repository.ProductRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -21,12 +22,15 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CheckItemsUseCase {
 
     private final ProductsEventPublisherPort productsEventPublisherPort;
     private final ProductRepositoryPort productRepositoryPort;
 
     public void execute(Envelope<ProductsCheckItems> envelope) {
+
+        log.info("Starting the item check: {}", envelope.payload());
 
         List<ItemsSolicited> envProductsList = envelope.payload().items();
         ProductsCheckItems envPayload = envelope.payload();
@@ -55,8 +59,10 @@ public class CheckItemsUseCase {
                 new ProductsItemsChecked(envPayload.requestId(), new Customer(envPayload.customer().keycloakUserId()),
                         new Card(envPayload.card().cardId()), statusProduct, itemsOrder, errors)
         );
-
+        log.info("The item check was completed. A new message to create will be published: {}",
+                envelopeItemsChecked.payload());
         productsEventPublisherPort.publish(envelopeItemsChecked);
+
 
 
     }
